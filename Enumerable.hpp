@@ -1,9 +1,6 @@
 //Author: Soufiane
-
 #ifndef __SFN_ENUMERABLE_
 #define __SFN_ENUMERABLE_
-
-//Author: Soufiane
 
 #include <functional>
 #include <iostream>
