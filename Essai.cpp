@@ -1,42 +1,22 @@
+#include <list>
 #include "Enumerable.hpp"
-
 
 int main()
 {
-    SFN::Enumerable<int>::Range(-100, 100)
-        .Where([](int i) -> bool {
-            return i % 15 == 0;
-            })
-        .Select<char>([](int i) -> int {
-                    if(i<0)
-                        return 'z';
-                    return (char) 'A' + i%27;
-                })
-        .Foreach([](char a) -> void {
-                std::cout << a;
-            });
-    std::cout << " END 1\n";
-    auto a = SFN::ENUMERABLE(int, [], {
-                run(1); // yield return 1;
-                run(200);
-                run(30);
-                run(5);
-            });
-    bool bFirstLoop = true;
-    a.Where([](int i) -> bool {
-            return i % 2 != 0;
-            })
-        .Select<int>([](int i) -> int {
-                    return 2*i;
-                })
-        .Foreach([&bFirstLoop](int i) -> void {
-                if(bFirstLoop)
-                {
-                    std::cout << i;
-                    bFirstLoop = false;
-                }
-                    std::cout << "-" << i;
-            });
-    std::cout << " END 2\n";
+    std::list<int> primes;
+    SFN::Enumerable<int>::Range(0,10000000)
+        .Where([&](int i) -> bool {
+            for(auto p : primes)
+            {
+                if(p>1 && i % p == 0)
+                    return false;
+            }
+            return true;
+        })
+        .Do([&](int i) -> void { primes.push_back(i); })
+        .Where([](int i ) -> bool { return i > 10000; })
+        .Take(20)
+        .Do([](int i) -> void { std::cout << i << " is a prime number" << std::endl; })
+        .Foreach([](int) -> void {});
     return 0;
 }

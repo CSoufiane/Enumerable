@@ -3,6 +3,8 @@
 #ifndef __SFN_ENUMERABLE_
 #define __SFN_ENUMERABLE_
 
+//Author: Soufiane
+
 #include <functional>
 #include <iostream>
 namespace SFN
@@ -21,9 +23,7 @@ namespace SFN
         }
         static Enumerable<T> Range(T t1, T t2)
         {
-            return ENUMERABLE(T,[=],{
-                for(T t = t1; t < t2; ++t) run(t);
-            });
+            return ENUMERABLE(T,[=],{ for(T t = t1; t < t2; ++t) run(t); });
         }
         Enumerable(const Enumerable<T>& e):_looper(e._looper)
         {
@@ -50,6 +50,19 @@ namespace SFN
                 data.Foreach(filter);
             });
         }
+        Enumerable<T> Do(std::function<void(T)> extraWork) const
+        {
+            const Enumerable<T>& data = *this;
+            return Enumerable<T> ([=] (std::function<void(T)> run)
+            {
+                auto filter = [=](T t) -> void
+                {
+                    extraWork(t);
+                    run(t);
+                };
+                data.Foreach(filter);
+            });
+        }
         template<typename U>
         Enumerable<U> Select(std::function<U(T)> transform) const
         {
@@ -63,11 +76,31 @@ namespace SFN
                 data.Foreach(filter);
             });
         }
+
         Enumerable<T> Select(std::function<T(T)> transform) const
         {
             return Select<T>(transform);
         }
-    
+        Enumerable<T> Take(unsigned int n)
+        {
+            class _STOP_TO_COMPUTE_{};
+            const Enumerable<T>& data = *this;
+            return Enumerable<T> ([=] (std::function<void(T)> run)
+            {
+                auto stop = n;
+                auto computer = [=](T t) mutable -> void
+                {
+                    if(stop<=0)
+                        throw _STOP_TO_COMPUTE_();
+                    --stop;
+                    run(t);
+                };
+                try
+                {
+                    data.Foreach(computer);
+                }catch(_STOP_TO_COMPUTE_&) {}
+            });
+        }    
     };
 
 }
