@@ -34,6 +34,11 @@ namespace SFN
         {
             _looper(f);
         };
+        void Run() const
+        {
+            auto _void = [](T) -> void {};
+            Foreach(_void);
+        }
         Enumerable<T> Where(std::function<bool(T)> condition) const
         {
             const Enumerable<T>& data = *this;
@@ -64,7 +69,7 @@ namespace SFN
         Enumerable<U> Select(std::function<U(T)> transform) const
         {
             const Enumerable<T>& data = *this;
-            return Enumerable<U> ([=] (std::function<void(T)> run)
+            return Enumerable<U> ([=] (std::function<void(U)> run)
             {
                 auto filter = [=](T t) -> void
                 {

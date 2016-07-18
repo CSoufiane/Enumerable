@@ -1,22 +1,32 @@
 #include <list>
+#include <string>
 #include "Enumerable.hpp"
+
+using namespace std;
 
 int main()
 {
-    std::list<int> primes;
+    list<int> primes;
+
     SFN::Enumerable<int>::Range(0,10000000)
+        //Filter the prime number
         .Where([&](int i) -> bool {
             for(auto p : primes)
             {
-                if(p>1 && i % p == 0)
+                if( 1 < p && i % p == 0)
                     return false;
             }
             return true;
         })
+        //Store the prime number
         .Do([&](int i) -> void { primes.push_back(i); })
+        //Process prime number > 10000
         .Where([](int i ) -> bool { return i > 10000; })
-        .Take(20)
-        .Do([](int i) -> void { std::cout << i << " is a prime number" << std::endl; })
-        .Foreach([](int) -> void {});
+        .Take(5)
+        .Select<string>([](int i) -> string { return to_string(i); })
+        .Do([](string s) -> void { cout << s << " is a prime number" << endl; })
+        .Run();
+
+    cout << "Number of prime number found = " << primes.size() << endl;
     return 0;
 }
